@@ -38,16 +38,5 @@
       "Glucose biscuit",
       "Contains wheat, sugar, edible vegetable oil"
     ]
-  },
-  {
-    "id": "786",
-    "name": "dev lund",
-    "price": "1",
-    "stock": "in stock",
-    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrFmnwz2F7yUXjf78LiHOHxeFIZwYgVlrPsUIEeYtGy9ezcuDs3QNsOnhb&s=10",
-    "description": "dev aak lund",
-    "features": [
-      "zero features"
-    ]
   }
 ]
