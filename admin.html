@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Product Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F7F4EC; --ink:#1F1B16; --ink-soft:#5B5548; --accent:#C1440E; --line:#DEDACB; --ok:#3C6E47;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Mono',monospace;padding:24px 16px 60px;}
+  .wrap{max-width:640px;margin:0 auto;}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px;}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:26px;margin:0 0 6px;}
+  h2{font-family:'Space Grotesk',sans-serif;font-size:15px;margin:28px 0 4px;}
+  .sub{color:var(--ink-soft);font-size:13px;line-height:1.5;margin-bottom:20px;}
+  .panel{background:#FFFDF9;border:1px solid var(--line);border-radius:2px;padding:18px;margin-bottom:20px;}
+  label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);margin:12px 0 5px;}
+  label:first-child{margin-top:0;}
+  input,textarea{width:100%;font-family:'IBM Plex Mono',monospace;font-size:14px;padding:9px 10px;border:1px solid var(--line);border-radius:2px;background:#fff;color:var(--ink);}
+  textarea{resize:vertical;min-height:60px;}
+  .hint{font-size:11px;color:var(--ink-soft);margin-top:4px;}
+  button{margin-top:16px;width:100%;background:var(--ink);color:var(--paper);border:none;border-radius:2px;padding:13px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+  button:hover{background:var(--accent);}
+  button:disabled{opacity:.5;cursor:not-allowed;}
+  .status{margin-top:14px;font-size:12.5px;padding:10px 12px;border-radius:2px;display:none;}
+  .status.show{display:block;}
+  .status.ok{background:#E4EFE6;color:var(--ok);}
+  .status.err{background:#F6DFD6;color:var(--accent);}
+  .list-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+  .list-item:last-child{border-bottom:none;}
+  .list-item button{width:auto;margin:0;padding:6px 12px;font-size:11px;background:var(--accent);}
+  .row{display:flex;gap:8px;align-items:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Admin</div>
+  <h1>Add / Edit Products</h1>
+  <p class="sub">Fill this form and click Save — it writes straight into products.json on GitHub. No need to open GitHub manually.</p>
+
+  <div class="panel">
+    <h2 style="margin-top:0">Connect to your GitHub repo (one-time per session)</h2>
+    <label for="owner">GitHub username</label>
+    <input id="owner" placeholder="meetpatel1275">
+
+    <label for="repo">Repository name</label>
+    <input id="repo" placeholder="my-store">
+
+    <label for="token">Personal Access Token</label>
+    <input id="token" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    <div class="hint">Create one at github.com → Settings → Developer settings → Fine-grained tokens → give it Contents: Read & Write access to just this one repo. Never share this token with anyone. It's only used to talk to GitHub directly from your browser — not stored anywhere.</div>
+  </div>
+
+  <div class="panel">
+    <h2 style="margin-top:0">Product details</h2>
+    <label for="id">Product ID</label>
+    <input id="id" placeholder="103">
+    <div class="hint">If this ID already exists in products.json, saving will update it instead of adding a new one.</div>
+
+    <label for="name">Name</label>
+    <input id="name" placeholder="Product name">
+
+    <label for="price">Price</label>
+    <input id="price" placeholder="$99.00">
+
+    <label for="stock">Stock status</label>
+    <input id="stock" placeholder="In stock">
+
+    <label for="image">Image URL</label>
+    <input id="image" placeholder="https://...">
+
+    <label for="description">Description</label>
+    <textarea id="description"></textarea>
+
+    <label for="features">Features (one per line)</label>
+    <textarea id="features"></textarea>
+
+    <button id="saveBtn">Save to products.json</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="panel">
+    <h2 style="margin-top:0">Current products</h2>
+    <div id="list">Loading…</div>
+    <button id="refreshBtn" style="background:var(--ink-soft)">Refresh list</button>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+function apiHeaders(){
+  return {
+    'Authorization': 'Bearer ' + $('token').value.trim(),
+    'Accept': 'application/vnd.github+json'
+  };
+}
+function apiUrl(){
+  return `https://api.github.com/repos/${$('owner').value.trim()}/${$('repo').value.trim()}/contents/products.json`;
+}
+
+function showStatus(msg, ok){
+  const el = $('status');
+  el.textContent = msg;
+  el.className = 'status show ' + (ok ? 'ok' : 'err');
+}
+
+// UTF-8 safe base64 helpers
+function toBase64(str){ return btoa(unescape(encodeURIComponent(str))); }
+function fromBase64(b64){ return decodeURIComponent(escape(atob(b64))); }
+
+async function fetchProducts(){
+  const res = await fetch(apiUrl(), { headers: apiHeaders() });
+  if (!res.ok) throw new Error('Could not read products.json (check username/repo/token). Status ' + res.status);
+  const data = await res.json();
+  const products = JSON.parse(fromBase64(data.content));
+  return { products, sha: data.sha };
+}
+
+async function saveProducts(products, sha, commitMsg){
+  const body = {
+    message: commitMsg,
+    content: toBase64(JSON.stringify(products, null, 2)),
+    sha: sha
+  };
+  const res = await fetch(apiUrl(), {
+    method: 'PUT',
+    headers: { ...apiHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok){
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err.message || ('Save failed. Status ' + res.status));
+  }
+}
+
+async function renderList(){
+  const listEl = $('list');
+  listEl.textContent = 'Loading…';
+  try{
+    const { products } = await fetchProducts();
+    if (!products.length){ listEl.textContent = 'No products yet.'; return; }
+    listEl.innerHTML = products.map(p => `
+      <div class="list-item">
+        <span>#${escapeHtml(p.id)} — ${escapeHtml(p.name)} (${escapeHtml(p.price || '')})</span>
+        <button data-id="${escapeHtml(p.id)}" class="delBtn">Delete</button>
+      </div>`).join('');
+    document.querySelectorAll('.delBtn').forEach(btn => {
+      btn.addEventListener('click', () => deleteProduct(btn.dataset.id));
+    });
+  }catch(e){
+    listEl.textContent = e.message;
+  }
+}
+
+async function deleteProduct(id){
+  if (!confirm('Delete product #' + id + '?')) return;
+  try{
+    const { products, sha } = await fetchProducts();
+    const updated = products.filter(p => String(p.id) !== String(id));
+    await saveProducts(updated, sha, `Delete product #${id}`);
+    showStatus('Deleted product #' + id, true);
+    renderList();
+  }catch(e){
+    showStatus(e.message, false);
+  }
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+$('saveBtn').addEventListener('click', async () => {
+  const id = $('id').value.trim();
+  if (!id){ showStatus('Product ID is required.', false); return; }
+
+  const newProduct = {
+    id,
+    name: $('name').value.trim(),
+    price: $('price').value.trim(),
+    stock: $('stock').value.trim(),
+    image: $('image').value.trim(),
+    description: $('description').value.trim(),
+    features: $('features').value.split('\n').map(f=>f.trim()).filter(Boolean)
+  };
+
+  $('saveBtn').disabled = true;
+  showStatus('Saving…', true);
+  try{
+    const { products, sha } = await fetchProducts();
+    const idx = products.findIndex(p => String(p.id) === String(id));
+    const isUpdate = idx !== -1;
+    if (isUpdate) products[idx] = newProduct; else products.push(newProduct);
+
+    await saveProducts(products, sha, isUpdate ? `Update product #${id}` : `Add product #${id}`);
+    showStatus((isUpdate ? 'Updated' : 'Added') + ' product #' + id + '. Live in ~15-30 seconds.', true);
+    renderList();
+  }catch(e){
+    showStatus(e.message, false);
+  }finally{
+    $('saveBtn').disabled = false;
+  }
+});
+
+$('refreshBtn').addEventListener('click', renderList);
+</script>
+</body>
+</html>
