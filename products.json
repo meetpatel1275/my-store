@@ -1,12 +1,17 @@
 [
   {
     "id": "101",
-    "name": "headphone",
-    "price": "2000",
-    "stock": "in stock",
-    "image": "",
-    "description": "",
-    "features": []
+    "name": "Aether Pro Wireless Headphones",
+    "price": "$249.00",
+    "stock": "In stock",
+    "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=700",
+    "description": "Over-ear wireless headphones tuned for studio-accurate sound, with adaptive ANC and a foldable aluminum frame.",
+    "features": [
+      "40hr battery life",
+      "Active noise cancellation",
+      "Bluetooth 5.3",
+      "Multipoint pairing"
+    ]
   },
   {
     "id": "102",
@@ -19,6 +24,19 @@
       "350ml capacity",
       "Stoneware ceramic",
       "Dishwasher safe"
+    ]
+  },
+  {
+    "id": "555",
+    "name": "Parle-G Biscuit Packet (200g)",
+    "price": "\u20b910",
+    "stock": "In stock",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMJ5SIIsoEUngtVKETOKND9fBmgcwEF8VPc3dWkOsZFA&s=10",
+    "description": "Classic glucose biscuit, a household favourite across India since 1938.",
+    "features": [
+      "Net weight: 200g",
+      "Glucose biscuit",
+      "Contains wheat, sugar, edible vegetable oil"
     ]
   }
 ]
