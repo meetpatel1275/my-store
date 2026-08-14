@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Product Detail</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F4EC; --ink:#1F1B16; --ink-soft:#5B5548;
+    --accent:#C1440E; --line:#DEDACB;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Mono',monospace;padding:24px 16px 60px;}
+  .wrap{max-width:520px;margin:0 auto;}
+  .state{text-align:center;padding:80px 20px;color:var(--ink-soft);font-size:14px;line-height:1.6;}
+  img.hero{width:100%;border-radius:8px;display:block;margin-bottom:18px;border:1px solid var(--line);object-fit:cover;max-height:360px;}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:6px;}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:24px;margin:0 0 6px;line-height:1.25;}
+  .price-row{display:flex;align-items:center;gap:10px;margin:8px 0 18px;}
+  .price{font-family:'Space Grotesk',sans-serif;font-size:22px;color:var(--accent);font-weight:600;}
+  .stock{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#3C6E47;background:#E4EFE6;padding:3px 8px;border-radius:20px;}
+  p.desc{line-height:1.6;color:#3f3a30;font-size:14px;}
+  h2{font-family:'Space Grotesk',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin:22px 0 8px;}
+  ul{margin:0;padding-left:18px;line-height:1.9;font-size:14px;}
+  .footnote{margin-top:32px;padding-top:16px;border-top:1px dashed var(--line);font-size:10.5px;color:var(--ink-soft);letter-spacing:.05em;text-transform:uppercase;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="state">Loading product…</div>
+</div>
+
+<script>
+async function render(){
+  const app = document.getElementById('app');
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+
+  if (!id){
+    app.innerHTML = '<div class="state">No product ID in the link.<br>Expected a URL like <code>product.html?id=101</code>.</div>';
+    return;
+  }
+
+  let products;
+  try{
+    const res = await fetch('./products.json', {cache:'no-store'});
+    products = await res.json();
+  }catch(e){
+    app.innerHTML = '<div class="state">Could not load the product database.<br>Check that products.json is deployed alongside this page.</div>';
+    return;
+  }
+
+  const p = products.find(x => String(x.id) === String(id));
+  if (!p){
+    app.innerHTML = `<div class="state">No product found for ID "${escapeHtml(id)}".<br>Check products.json.</div>`;
+    return;
+  }
+
+  const featureItems = (p.features || []).map(f => `<li>${escapeHtml(f)}</li>`).join('');
+
+  app.innerHTML = `
+    ${p.image ? `<img class="hero" src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}">` : ''}
+    <div class="eyebrow">Product Detail</div>
+    <h1>${escapeHtml(p.name)}</h1>
+    <div class="price-row">
+      <span class="price">${escapeHtml(p.price || '')}</span>
+      ${p.stock ? `<span class="stock">${escapeHtml(p.stock)}</span>` : ''}
+    </div>
+    <p class="desc">${escapeHtml(p.description || '')}</p>
+    ${featureItems ? `<h2>Features</h2><ul>${featureItems}</ul>` : ''}
+    <div class="footnote">Live product data · scanned via QR</div>
+  `;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+render();
+</script>
+</body>
+</html>

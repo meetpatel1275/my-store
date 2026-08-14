@@ -1,0 +1,29 @@
+[
+  {
+    "id": "101",
+    "name": "Aether Pro Wireless Headphones",
+    "price": "$249.00",
+    "stock": "In stock",
+    "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=700",
+    "description": "Over-ear wireless headphones tuned for studio-accurate sound, with adaptive ANC and a foldable aluminum frame.",
+    "features": [
+      "40hr battery life",
+      "Active noise cancellation",
+      "Bluetooth 5.3",
+      "Multipoint pairing"
+    ]
+  },
+  {
+    "id": "102",
+    "name": "Terra Ceramic Mug",
+    "price": "$18.00",
+    "stock": "In stock",
+    "image": "https://images.unsplash.com/photo-1517663029900-a2e1e6bef8c5?w=700",
+    "description": "Hand-glazed stoneware mug, microwave and dishwasher safe.",
+    "features": [
+      "350ml capacity",
+      "Stoneware ceramic",
+      "Dishwasher safe"
+    ]
+  }
+]

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Generate Product QR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{--paper:#F7F4EC; --ink:#1F1B16; --ink-soft:#5B5548; --accent:#C1440E; --line:#DEDACB;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'IBM Plex Mono',monospace;padding:24px 16px 60px;}
+  .wrap{max-width:440px;margin:0 auto;}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:8px;}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:26px;margin:0 0 6px;}
+  .sub{color:var(--ink-soft);font-size:13px;line-height:1.5;margin-bottom:24px;}
+  label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);margin:14px 0 5px;}
+  input{width:100%;font-family:'IBM Plex Mono',monospace;font-size:14px;padding:9px 10px;border:1px solid var(--line);border-radius:2px;background:#fff;color:var(--ink);}
+  .hint{font-size:11px;color:var(--ink-soft);margin-top:4px;}
+  button{margin-top:20px;width:100%;background:var(--ink);color:var(--paper);border:none;border-radius:2px;padding:13px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+  button:hover{background:var(--accent);}
+  .result{margin-top:28px;text-align:center;}
+  #qrcode{display:flex;justify-content:center;margin-bottom:12px;}
+  .url-preview{font-size:11px;color:var(--ink-soft);word-break:break-all;background:#fff;border:1px solid var(--line);padding:8px 10px;border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Dynamic QR</div>
+  <h1>Generate a Product QR</h1>
+  <p class="sub">This QR points to a fixed URL on your live site. The page it opens always re-reads products.json — so editing that file updates what every printed QR shows, without ever changing the QR itself.</p>
+
+  <label for="baseUrl">Your live site URL (from GitHub Pages)</label>
+  <input id="baseUrl" placeholder="https://yourusername.github.io/my-store/" value="https://yourusername.github.io/my-store/">
+  <div class="hint">You'll get this after deploying — see the setup steps.</div>
+
+  <label for="productId">Product ID</label>
+  <input id="productId" placeholder="101" value="101">
+  <div class="hint">Must match an "id" in products.json.</div>
+
+  <button id="genBtn">Generate QR</button>
+
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+document.getElementById('genBtn').addEventListener('click', () => {
+  let base = document.getElementById('baseUrl').value.trim();
+  const id = document.getElementById('productId').value.trim();
+  if (!base.endsWith('/')) base += '/';
+  const fullUrl = base + 'product.html?id=' + encodeURIComponent(id);
+
+  const result = document.getElementById('result');
+  result.innerHTML = '<div id="qrcode"></div><div class="url-preview"></div>';
+  document.querySelector('.url-preview').textContent = fullUrl;
+
+  new QRCode(document.getElementById('qrcode'), {
+    text: fullUrl,
+    width: 200,
+    height: 200,
+    colorDark: '#1F1B16',
+    colorLight: '#FFFDF9',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+});
+
+document.getElementById('genBtn').click();
+</script>
+</body>
+</html>
