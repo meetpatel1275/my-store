@@ -29,7 +29,7 @@
   {
     "id": "555",
     "name": "Parle-G Biscuit Packet (200g)",
-    "price": "\u20b910",
+    "price": "₹10",
     "stock": "In stock",
     "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMJ5SIIsoEUngtVKETOKND9fBmgcwEF8VPc3dWkOsZFA&s=10",
     "description": "Classic glucose biscuit, a household favourite across India since 1938.",
@@ -37,6 +37,17 @@
       "Net weight: 200g",
       "Glucose biscuit",
       "Contains wheat, sugar, edible vegetable oil"
+    ]
+  },
+  {
+    "id": "786",
+    "name": "dev lund",
+    "price": "1",
+    "stock": "in stock",
+    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrFmnwz2F7yUXjf78LiHOHxeFIZwYgVlrPsUIEeYtGy9ezcuDs3QNsOnhb&s=10",
+    "description": "dev aak lund",
+    "features": [
+      "zero features"
     ]
   }
 ]
