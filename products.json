@@ -38,14 +38,5 @@
       "Glucose biscuit",
       "Contains wheat, sugar, edible vegetable oil"
     ]
-  },
-  {
-    "id": "556",
-    "name": "wafer",
-    "price": "10",
-    "stock": "",
-    "image": "",
-    "description": "",
-    "features": []
   }
 ]
